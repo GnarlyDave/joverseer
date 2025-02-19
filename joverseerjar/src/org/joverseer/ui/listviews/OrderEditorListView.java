@@ -42,6 +42,7 @@ import org.joverseer.tools.OrderValidationResult;
 import org.joverseer.tools.ordercheckerIntegration.OrderResult;
 import org.joverseer.tools.ordercheckerIntegration.OrderResultContainer;
 import org.joverseer.ui.LifecycleEventsEnum;
+import org.joverseer.ui.listviews.AdvancedArtifactListView.OrderEditingKeyAdapter;
 import org.joverseer.ui.listviews.renderers.HexNumberCellRenderer;
 import org.joverseer.ui.orderEditor.AbstractOrderSubeditor;
 import org.joverseer.ui.orderEditor.CastLoSpellOrderSubeditor;
@@ -54,9 +55,12 @@ import org.joverseer.ui.support.JOverseerEvent;
 import org.joverseer.ui.support.controls.AutocompletionComboBox;
 import org.joverseer.ui.support.controls.JOverseerTable;
 import org.joverseer.ui.support.controls.TableUtils;
+import org.springframework.binding.value.support.ListListModel;
 import org.springframework.richclient.application.Application;
 import org.springframework.richclient.command.ActionCommand;
 import org.springframework.richclient.command.CommandGroup;
+import org.springframework.richclient.list.ComboBoxListModelAdapter;
+import org.springframework.richclient.list.SortedListModel;
 import org.springframework.richclient.table.BeanTableModel;
 import org.springframework.richclient.table.ColumnToSort;
 import org.springframework.richclient.table.ShuttleSortableTableModel;
@@ -493,7 +497,7 @@ public class OrderEditorListView extends ItemListView {
 					JLabel lbl = (JLabel) super.getTableCellRendererComponent(table1, "", isSelected, hasFocus, row, column);
 					lbl.setIcon(ico);
 					if (ico != null) {
-						OrderResultContainer container = OrderResultContainer.instance();
+						OrderResultContainer container = OrderEditorListView.this.gameHolder.getGame().getTurn().getOrderResults().getResultCont();
 						int idx = ((SortableTableModel) table1.getModel()).convertSortedIndexToDataIndex(row);
 						Object obj = OrderEditorListView.this.tableModel.getRow(idx);
 						Order o = (Order) obj;
@@ -712,6 +716,7 @@ public class OrderEditorListView extends ItemListView {
 			if (order != null) {
 				order.clear();
 				((BeanTableModel) OrderEditorListView.this.table.getModel()).fireTableDataChanged();
+				OrderEditorListView.this.gameHolder.getGame().getTurn().getOrderResults().getResultCont().removeResultsForOrder(order);
 				JOApplication.publishEvent(LifecycleEventsEnum.OrderChangedEvent, order, this);
 			}
 		}
@@ -976,7 +981,7 @@ public class OrderEditorListView extends ItemListView {
 			return lbl;
 		}
 	}
-
+	
 	class OrderEditingKeyAdapter extends KeyAdapter {
 		CellEditor editor;
 		public OrderEditingKeyAdapter(CellEditor editor) {
@@ -988,20 +993,21 @@ public class OrderEditorListView extends ItemListView {
 			if (arg0.getKeyCode() == KeyEvent.VK_ESCAPE) {
 				this.editor.cancelCellEditing();
 				arg0.consume();
-			} else if (arg0.getKeyCode() == KeyEvent.VK_TAB) {
-				/*							int col = OrderEditorListView.this.table.getSelectedColumn();
-				if (col+1 >= OrderEditorListView.this.table.getColumnCount()) {
-				} else {
-					OrderEditorListView.this.table.changeSelection(row, col+1, false, false);
-				}
-*/						} else if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
-				int col = OrderEditorListView.this.table.getSelectedColumn();
-				if (col+1 > OrderEditorListView.this.lastColumnForSelectedOrder) {
-					OrderEditorListView.this.table.changeSelection(OrderEditorListView.this.table.getSelectedRow()+1, OrderEditorTableModel.iNoAndCode, false, false);
-				} else {
-					OrderEditorListView.this.table.changeSelection(OrderEditorListView.this.table.getSelectedRow(), col+1, false, false);
-				}
-			}
+			} 
+//				else if (arg0.getKeyCode() == KeyEvent.VK_TAB) {
+//				/*							int col = OrderEditorListView.this.table.getSelectedColumn();
+//				if (col+1 >= OrderEditorListView.this.table.getColumnCount()) {
+//				} else {
+//					OrderEditorListView.this.table.changeSelection(row, col+1, false, false);
+//				}
+//*/						} else if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+//				int col = OrderEditorListView.this.table.getSelectedColumn();
+//				if (col+1 > OrderEditorListView.this.lastColumnForSelectedOrder) {
+//					OrderEditorListView.this.table.changeSelection(OrderEditorListView.this.table.getSelectedRow()+1, OrderEditorTableModel.iNoAndCode, false, false);
+//				} else {
+//					OrderEditorListView.this.table.changeSelection(OrderEditorListView.this.table.getSelectedRow(), col+1, false, false);
+//				}
+//			}
 		}
 
 	}

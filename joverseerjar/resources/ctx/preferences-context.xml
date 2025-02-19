@@ -590,6 +590,14 @@
 									<value>Color/Allegiance</value>
 								</property>
 							</bean>
+							<bean class="org.joverseer.preferences.PreferenceValue">
+								<property name="key">
+									<value>custom</value>
+								</property>
+								<property name="description">
+									<value>Color/Custom</value>
+								</property>
+							</bean>
 						</list>
 					</property>
 				</bean>
